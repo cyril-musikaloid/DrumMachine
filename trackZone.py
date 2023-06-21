@@ -7,9 +7,43 @@ def doPlay(self:Button, instance):
 def doPause(self:Button, instance):
     instance.isPlaying = False
 
+def doIncreaseTempoDiv(self:Button, instance):
+    instance.setTempoDiv(instance.tempoDiv / 2)
+    instance.setTrackZoom(instance.trackZoom * 2)
+    instance.shouldRenderTempoDiv = True
+
+def doDecreaseTempoDiv(self: Button, instance):
+    instance.setTempoDiv(instance.tempoDiv * 2)
+    instance.setTrackZoom(instance.trackZoom / 2)
+    instance.shouldRenderTempoDiv = True
+
+class TempoDivSelector(Frame):
+    def __init__(self, instance, parent = None, pos = (0, 0), size = (0, 0)):
+        super().__init__(pos, size, parent)
+
+        self.instance = instance
+
+        w, h = self.getSize()
+        self.left = Button((0, 0), (h, h), self,
+                      "leftArrowPress.svg", "leftArrowRelease.svg")
+        self.left.setPressCallback(doDecreaseTempoDiv)
+
+        self.right = Button((-1, 0), (h, h), self,
+                       "rightArrowPress.svg", "rightArrowRelease.svg")
+        self.right.setPressCallback(doIncreaseTempoDiv)
+        
+        displayWidth = self.right.getLeft() - self.left.getRight()
+        self.display = Frame((self.left.getRight(), 0), (displayWidth, h), self)
+        
+    def render(self, window):
+        if (self.instance.shouldRenderTempoDiv):
+            self.display._texture = Text(str(1/self.instance.tempoDiv), self.getHeight())
+            self.instance.shouldRenderTempoDiv = False
+        
+        super().render(window)
 
 class TrackToolBar(Frame):
-    def __init__(self, parent = None, pos = (0, 0), size = (0, 0)):
+    def __init__(self, instance, parent = None, pos = (0, 0), size = (0, 0)):
         super().__init__(pos, size, parent)
 
         size = self.getSize()
@@ -22,6 +56,8 @@ class TrackToolBar(Frame):
         pause = Button((sizeH, 0), buttonSize, self,
                        "pausePress.svg", "pauseRelease.svg")
         pause.setPressCallback(doPause)
+
+        TempoDivSelector(instance, self, (pause.getRight(), 0), (0.15, sizeH))
 
 class TrackName(Frame):
     def __init__(self, name = "", parent = None, pos = (0, 0), size = (0, 0)):
@@ -86,7 +122,7 @@ class TrackPart(Frame):
 
         numStep = int(instance.numberDisplayedStep + 1)
         stepWidth = w / instance.numberDisplayedStep
-        timestamp = instance.timestamp
+        timestamp = instance.getTimestamp()
         stepDuration = instance.getStepDurationMS()
         offset = int(stepWidth * timestamp / stepDuration)
 
@@ -127,7 +163,7 @@ class PartZone(Frame):
         w, h = self.getSize()
 
         instance = self.instance
-        timestamp = instance.timestamp
+        timestamp = instance.getTimestamp()
         stepDuration = instance.getStepDurationMS()
         numberStep = instance.numberDisplayedStep
         stepWidth = w / numberStep
@@ -148,10 +184,19 @@ class PartZone(Frame):
         return w / self.instance.numberDisplayedStep
 
     def getXOffset(self):
-         return int(self.getStepWidth() * self.instance.timestamp / self.instance.getStepDurationMS())
+         return int(self.getStepWidth() * self.instance.getTimestamp() / self.instance.getStepDurationMS())
 
     def xToStep(self, x:int):
         return int((self.getXOffset() + x) / self.getStepWidth())
+
+class TrackTime(Frame):
+    def __init__(self, instance, parent = None, pos = (0,0), size = (0,0)):
+        super().__init__(pos, size, parent)
+
+        w, h = self.getSize()
+        self.instance = instance
+        self.bgTexture = ColorTexture(215, 215, 250, (w, h))
+        Frame(size=(w, h), parent=self, texture=self.bgTexture)
 
 class TrackZone(Frame):
     def __init__(self, instance, parent = None, pos = (0, 0), size = (0, 0)):
@@ -164,7 +209,7 @@ class TrackZone(Frame):
         
         trackH = 0.125
         
-        trackToolBar = TrackToolBar(self, (0, 0), (-1, trackH))
+        trackToolBar = TrackToolBar(instance, self, (0, 0), (-1, trackH))
 
         trackY = trackToolBar.getBottom()
         toolZone = Frame((0, trackY), size=(separator, -1), parent=self)
@@ -178,8 +223,12 @@ class TrackZone(Frame):
         for track in instance.tracks:
             if (track != "length"):
                 trackTool = TrackTool(track, toolZone, (0, trackY), (-1, trackH))
-                trackPart = TrackPart(track, instance, partZone, (0, trackY), (-1, trackH), partZone.horizontalLineTexture)
+                trackPart = TrackPart(track, instance, partZone, (0, trackY), (-1, trackH),
+                                      partZone.horizontalLineTexture)
+                
+            else:
+                TrackTime(instance, partZone, (0, trackY), (-1, trackH))
 
-                trackY += trackH
+            trackY += trackH
 
 

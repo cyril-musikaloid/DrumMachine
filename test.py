@@ -9,8 +9,8 @@ from padZone import *
 from trackZone import *
 from instance import *
 
-window = Window()
-#window = Window((1280, 720))
+#window = Window()
+window = Window((1280, 720))
 
 SCREEN_WIDTH, SCREEN_HEIGHT = window.getSize()
 
@@ -22,7 +22,7 @@ mainBg = ColorTexture(200, 200, 75, (SCREEN_WIDTH, SCREEN_HEIGHT))
 mainFrame.setTexture(mainBg)
 
 toolbar = Toolbar(mainFrame)
-instance = Instance(drum=drum, trackZoom=0.23, tempo=120)
+instance = Instance(drum=drum, trackZoom=1, tempo=30)
 
 padZone = PadZone(instance, mainFrame, (0, -1), (SCREEN_WIDTH, 0.33))
 

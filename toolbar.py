@@ -9,7 +9,7 @@ def quitRelease(self:Button, instance, hitPos):
 
 def leftCB(self:Button, instance, hitPos):
     if self.hitTest(hitPos):
-        instance.timestamp += 13
+        instance.timestampToStart()
 
 def rightCB(self:Button, instance, hitPos):
     if self.hitTest(hitPos):
