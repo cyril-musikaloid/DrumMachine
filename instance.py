@@ -25,7 +25,7 @@ class Instance():
         self.timestamp = timestamp
 
     def getStepDurationMS(self):
-        return int(60 / self.tempo / self.tempoDiv  / self.tempoDiv * 1000)
+        return int(60 / self.tempo / self.tempoDiv  * 1000)
     
     def increaseTimeStamp(self, dt):
         self.timestamp += dt
@@ -58,4 +58,4 @@ class Instance():
         self.numberDisplayedStep = 8 / trackZoom
 
     def getTimestamp(self):
-        return int(self.timestamp * self.tempoDiv)
+        return self.timestamp
