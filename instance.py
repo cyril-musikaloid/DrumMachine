@@ -25,18 +25,19 @@ class Instance():
         self.timestamp = timestamp
 
     def getStepDurationMS(self):
-        return int(60 / self.tempo / self.tempoDiv  * 1000)
+        return int(60 / self.tempo * 1000)
     
     def increaseTimeStamp(self, dt):
         self.timestamp += dt
 
     def getStep(self):
-        return int((self.timestamp - self.getStartTimestamp()) / self.getStepDurationMS())
+        return int((self.timestamp - self.getStartTimestamp()) / self.getStepDurationMS() - (1.0 if self.timestamp < 0 else 0.0))
 
     def execute(self):
         step = self.getStep()
 
         if (step != self.lastStep):
+            print(self.getStepDurationMS())
             self.lastStep = step
 
             for track in self.tracks:
@@ -49,6 +50,20 @@ class Instance():
     
     def timestampToStart(self):
         self.timestamp = self.getStartTimestamp()
+
+    def timestampToLastNote(self):
+        lastNotePos = 0
+
+        for track in self.tracks:
+            if track != "length":
+                maxNotePos = max(self.tracks[track])
+
+                if maxNotePos > lastNotePos:
+                    lastNotePos = maxNotePos
+
+        self.timestamp = self.getStepDurationMS() * lastNotePos - self.getStepDurationMS() * (self.numberDisplayedStep-1)
+
+
 
     def setTempoDiv(self, tempoDiv):
         self.tempoDiv = tempoDiv

@@ -22,11 +22,14 @@ mainBg = ColorTexture(200, 200, 75, (SCREEN_WIDTH, SCREEN_HEIGHT))
 mainFrame.setTexture(mainBg)
 
 toolbar = Toolbar(mainFrame)
-instance = Instance(drum=drum, trackZoom=1, tempo=30)
+toolbar.setTexture(ColorTexture(255, 0, 0, (toolbar.getWidth(), toolbar.getHeight())))
+instance = Instance(drum=drum, trackZoom=1, tempo=180)
 
 padZone = PadZone(instance, mainFrame, (0, -1), (SCREEN_WIDTH, 0.33))
+padZone.setTexture(ColorTexture(0, 0, 255, (padZone.getWidth(), padZone.getHeight())))
 
 tZone = TrackZone(instance, mainFrame, size=(-1, 0.5), pos=(0, toolbar.getBottom()))
+tZone.setTexture(ColorTexture(0, 255, 0, (tZone.getWidth(), tZone.getHeight())))
 
 window.render(mainFrame)
 

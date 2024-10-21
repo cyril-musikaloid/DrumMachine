@@ -13,7 +13,7 @@ def leftCB(self:Button, instance, hitPos):
 
 def rightCB(self:Button, instance, hitPos):
     if self.hitTest(hitPos):
-        instance.timestamp -= 13
+        instance.timestampToLastNote()
 
 class Toolbar(frame.Frame):
     def __init__(self, parent):
